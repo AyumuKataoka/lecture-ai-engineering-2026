@@ -21,14 +21,13 @@ from app.config import MODEL, api_error_message, get_api_key
 DEFAULT_QUESTION = "AIE2026の講座の宿題にある「3レベル」とは何ですか？"
 
 
-def ask(question: str) -> str:
+def ask(question: str) -> tuple[str, int | None, int | None]:
     client = genai.Client(api_key=get_api_key())
     response = client.models.generate_content(model=MODEL, contents=question)
-
-    # TODO(第1回 演習): response.usage_metadata から
-    #   入力トークン数と出力トークン数を表示してみよう（Copilotに頼んでよい）
-
-    return response.text
+    usage = response.usage_metadata
+    input_tokens = usage.prompt_token_count if usage else None
+    output_tokens = usage.candidates_token_count if usage else None
+    return response.text, input_tokens, output_tokens
 
 
 def main() -> None:
@@ -39,7 +38,10 @@ def main() -> None:
     print(f"[model] {MODEL}")
     print(f"[質問] {args.question}\n")
     try:
-        print(ask(args.question))
+        answer, input_tokens, output_tokens = ask(args.question)
+        print(answer)
+        print(f"\n[tokens] 入力: {input_tokens if input_tokens is not None else '不明'}, "
+              f"出力: {output_tokens if output_tokens is not None else '不明'}")
     except errors.APIError as e:
         print(api_error_message(e.code, e.message))
         raise SystemExit(1)
