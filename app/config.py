@@ -34,3 +34,26 @@ def get_api_key() -> str:
             "   （左下の「Codespaces」→「Stop Current Codespace」→ 再度開く）"
         )
     return key
+
+
+def get_google_provider():
+    """Gemini を呼ぶプロバイダを返す（agent.py と judge.py で共用）。
+
+    既定は Gemini API（GEMINI_API_KEY）。環境変数 AIE_PROVIDER=vertex のときだけ Vertex AI を使う。
+    Vertex AI のときは Application Default Credentials（gcloud auth application-default login）で認証し、
+    プロジェクトは AIE_GCP_PROJECT、リージョンは AIE_GCP_LOCATION（既定 global）で渡す。
+    プロジェクト ID はコードに書かない（公開リポジトリに出さないため）。
+    GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION は読まない（ほかのツール用に別の値が入っていることがあるため）。
+    """
+    if os.getenv("AIE_PROVIDER", "").lower() == "vertex":
+        from pydantic_ai.providers.google_cloud import GoogleCloudProvider
+
+        project = os.getenv("AIE_GCP_PROJECT")
+        if not project:
+            raise SystemExit("AIE_PROVIDER=vertex のときは、環境変数 AIE_GCP_PROJECT に GCP のプロジェクト ID を設定してください")
+        # project と location を明示して渡す（渡さないと GEMINI_API_KEY が拾われ、Vertex AI に向かないため）
+        return GoogleCloudProvider(project=project, location=os.getenv("AIE_GCP_LOCATION", "global"))
+
+    from pydantic_ai.providers.google import GoogleProvider
+
+    return GoogleProvider(api_key=get_api_key())

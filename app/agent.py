@@ -26,7 +26,7 @@ from pydantic_ai.models.test import TestModel
 from pydantic_ai.providers.google import GoogleProvider
 
 from app import tools
-from app.config import MODEL, api_error_message, get_api_key
+from app.config import MODEL, api_error_message, get_api_key, get_google_provider
 
 # ORG
 INSTRUCTIONS = """\
@@ -94,7 +94,7 @@ def build_mcp_agent(config_path: Path = MCP_CONFIG) -> Agent:
 
 
 def build_model() -> GoogleModel:
-    return GoogleModel(MODEL, provider=GoogleProvider(api_key=get_api_key()))
+    return GoogleModel(MODEL, provider=get_google_provider())
 
 
 def print_tools(target: Agent) -> None:
