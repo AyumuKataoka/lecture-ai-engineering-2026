@@ -31,7 +31,7 @@ from pydantic_ai.models.google import GoogleModel
 from pydantic_ai.providers.google import GoogleProvider
 
 from app import tools
-from app.config import MODEL, api_error_message, get_api_key
+from app.config import MODEL, api_error_message, get_api_key, get_google_provider
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CASES = ROOT / "data" / "eval" / "lec04_cases.jsonl"
@@ -125,7 +125,7 @@ def build_judge(model, rubric: str) -> Agent:
 
 def build_llm_model(model_name: str) -> GoogleModel:
     """Gemini のモデルを作る。API キーが無ければ手順を表示して終了する（app.agent と同じ）。"""
-    return GoogleModel(model_name, provider=GoogleProvider(api_key=get_api_key()))
+    return GoogleModel(model_name, provider=get_google_provider())
 
 
 # ---------------------------------------------------------------- 偽モデル（--model test）
