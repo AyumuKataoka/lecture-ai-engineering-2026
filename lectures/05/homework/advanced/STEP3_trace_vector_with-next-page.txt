@@ -1,0 +1,33 @@
+[model] gemini-3.5-flash-lite
+                 pydantic-ai v2.57.0 • Python 3.13.11
+
+      / \        agent: target • model: google-cloud:gemini-3.5-flash-lite • tools: 1
+     /   \         capabilities: 0
+   /___.___\
+  /    |    \    observability: off — see every model and tool call live, with cost
+/      |      \    set it up free with Logfire and a GitHub login: https://pydantic.dev/ai-setup.md
+`---.._|_..---'    or use any OpenTelemetry backend: https://pydantic.dev/docs/ai/logfire/#otel
+
+                 goes away once observability is on — or PYDANTIC_AI_NO_BANNER=1
+<repo>/.venv/lib/python3.13/site-packages/google/auth/_default.py:113: UserWarning: Your application has authenticated using end user credentials from Google Cloud SDK without a quota project. You might receive a "quota exceeded" or "API not enabled" error. See the following page for troubleshooting: https://cloud.google.com/docs/authentication/adc-troubleshooting/user-creds. 
+  warnings.warn(_CLOUD_SDK_CREDENTIALS_WARNING)
+LLMを使ったシステムの評価設計が難しいとされる主な理由は、LLMの持つ固有の性質や動作原理に起因しています。講義資料では、主に以下の点が挙げられています。
+
+1. **確率的に動作するため、同じ質問でも答えが揺れる**
+   - LLMは確率で次の言葉を選ぶため、1回試して「動いた」としても実際の正答率は分かりません。同じ質問を複数回聞いて平均やばらつきを見る必要があります（第2回・PDF p.13, p.18）。
+
+2. **知識がない質問に対しても、それらしく答えてしまう（ハルシネーション）**
+   - モデル自身は正しさを確かめず、確率的に「ありそうな文章」を作るため、知らないことでも流暢な誤りを出力します。そのため、知識がない質問も評価セットに含め、「分からない」と言えるかを測る必要があります（第2回・PDF p.14, p.18）。
+
+3. **「正解」を自動で判定・測定するのが難しい**
+   - 人の好みや満足度で測る人手評価（Human Preference Score）のほか、LLMに採点させる方法（LLM-as-a-Judge）も使われますが、採点役のLLM自体が正しく採点できているかの確認が必要になります（第1回・PDF p.40）。
+
+4. **長い文脈を均等に扱えない（Lost in the Middle の課題）**
+   - 一度に読める長さが伸びても、長い文脈の真ん中にある情報は見落とされやすいという特性があります。そのため、自分の用途や入力の長さに応じて正答率が落ちないかを検証する必要があります（第2回・PDF p.15, p.18）。
+
+--- trace ---
+[tool call]   search_materials({'query': '評価設計 難しい 理由 LLM'})
+[tool return] search_materials -> {"results": [{"page_id": "lec01-main-p040", "document_id": "lec01-main", "lecture": 1, "document_title": "AIエンジニアリング概論とA…
+[time] 回答完了まで 4.69 秒（検索・埋め込みを含む）
+[usage] 入力 2,662 tokens / 出力 409 tokens / モデル応答 2 回
+[cost] 生成APIの推定コスト: $0.001821 USD（埋め込み・索引構築分は含まない）
