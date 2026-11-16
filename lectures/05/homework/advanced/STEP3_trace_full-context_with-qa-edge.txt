@@ -1,0 +1,31 @@
+[model] gemini-3.5-flash-lite
+[full-context] 入力227,983文字
+                 pydantic-ai v2.57.0 • Python 3.13.11
+
+      / \        agent: agent • model: google-cloud:gemini-3.5-flash-lite • tools: 0
+     /   \         capabilities: 0
+   /___.___\
+  /    |    \    observability: off — see every model and tool call live, with cost
+/      |      \    set it up free with Logfire and a GitHub login: https://pydantic.dev/ai-setup.md
+`---.._|_..---'    or use any OpenTelemetry backend: https://pydantic.dev/docs/ai/logfire/#otel
+
+                 goes away once observability is on — or PYDANTIC_AI_NO_BANNER=1
+<repo>/.venv/lib/python3.13/site-packages/google/auth/_default.py:113: UserWarning: Your application has authenticated using end user credentials from Google Cloud SDK without a quota project. You might receive a "quota exceeded" or "API not enabled" error. See the following page for troubleshooting: https://cloud.google.com/docs/authentication/adc-troubleshooting/user-creds. 
+  warnings.warn(_CLOUD_SDK_CREDENTIALS_WARNING)
+ご質問ありがとうございます。
+
+LLMを使ったシステムの評価が難しいとされる理由について、講義資料には以下の根拠が示されています。
+
+1. **正解が1つに決まらない（出力が自由形式である）**
+   出力が自由形式の文章やコード、行動などになり、従来のソフトウェアのように「正しいか誤っているか」を単純に判定できません。そのため、「良い回答」を測る方法そのものを自分で設計する必要があります（資料: lec01-main / AIエンジニアリング概論とAIコーディング, PDF p.35 / PDF p.70）。
+2. **同じ入力でも出力が揺れる**
+   LLMは確率で次のトークンを選び続ける仕組み（サンプリング）であるため、同じ質問であっても実行ごとに答えが変わります。数例試して「動いた」と確認するだけでは、実際の正答率や品質を正しく測ることはできません（資料: lec01-main / AIエンジニアリング概論とAIコーディング, PDF p.35; 資料: lec02-main / 基盤モデルの仕組み, PDF p.8 / PDF p.13）。
+3. **体感と実測がずれる**
+   AIツール等を用いた実験において、作業後の本人の体感では「20%速くなった」と感じていても、実測ではかえって「19%遅かった」というケースが報告されています。良くなったかどうかは、主観的な体感に頼らず測らなければ分からないという難しさがあります（資料: lec01-main / AIエンジニアリング概論とAIコーディング, PDF p.27 / PDF p.35）。
+4. **評価そのものが最大の課題になる**
+   他者が学習した巨大な基盤モデルを組み合わせて使う「AIエンジニアリング」においては、従来のMLエンジニアリングと比べても、自由形式の出力を評価すること自体が最大の課題として立ちはだかります（資料: lec01-main / AIエンジニアリング概論とAIコーディング, PDF p.68）。
+
+--- trace ---
+[time] 回答完了まで 4.96 秒（検索・埋め込みを含む）
+[usage] 入力 117,026 tokens / 出力 444 tokens / モデル応答 1 回
+[cost] 生成APIの推定コスト: $0.036218 USD（埋め込み・索引構築分は含まない）
