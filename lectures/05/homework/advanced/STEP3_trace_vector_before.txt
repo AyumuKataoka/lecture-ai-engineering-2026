@@ -1,0 +1,37 @@
+[model] gemini-3.5-flash-lite
+                 pydantic-ai v2.57.0 • Python 3.13.11
+
+      / \        agent: target • model: google-cloud:gemini-3.5-flash-lite • tools: 1
+     /   \         capabilities: 0
+   /___.___\
+  /    |    \    observability: off — see every model and tool call live, with cost
+/      |      \    set it up free with Logfire and a GitHub login: https://pydantic.dev/ai-setup.md
+`---.._|_..---'    or use any OpenTelemetry backend: https://pydantic.dev/docs/ai/logfire/#otel
+
+                 goes away once observability is on — or PYDANTIC_AI_NO_BANNER=1
+<repo>/.venv/lib/python3.13/site-packages/google/auth/_default.py:113: UserWarning: Your application has authenticated using end user credentials from Google Cloud SDK without a quota project. You might receive a "quota exceeded" or "API not enabled" error. See the following page for troubleshooting: https://cloud.google.com/docs/authentication/adc-troubleshooting/user-creds. 
+  warnings.warn(_CLOUD_SDK_CREDENTIALS_WARNING)
+LLMを使ったシステムの評価設計が難しいとされる主な理由について、講義資料の根拠とともに以下に挙げます。
+
+1. **答えが確率的に変動する（揺れる）ため**
+   * **理由:** LLMは「次のトークン」を確率的に選び続ける機械であるため、同じ質問であっても出力される答えが毎回変わります（第2回・PDF p.13, p.8）。そのため、1回試して「動いた」としても実際の正答率は分からず（第2回・PDF p.13）、1回の正解はたまたまかもしれないという問題があります（第2回・PDF p.17）。評価を行うには、同じ質問を複数回聞いて平均やばらつきを見る必要があります（第2回・PDF p.13）。
+
+2. **知らないことでも「それらしく」答えてしまうため**
+   * **理由:** LLMは事前学習で「それらしさ」を学んでおり、知らない質問に対しても尤もらしい誤りを出力する特性があります（第2回・PDF p.8, p.17）。このため、あらかじめ答えられない質問もテストに含め、「分かりません」と適切に答えられるかを測る必要がありますが（第2回・PDF p.18）、このような誤りを含めて網羅的に検証する評価設計は簡単ではありません。
+
+3. **出力の良し悪しの測定（アノテーション・採点）が複雑なため**
+   * **理由:** チャットボットなどのシステムを評価する際、人の好みや満足度に基づく「人手評価（Human Preference Score）」を行うには手間がかかり、Label Studioなどのツールを用いた採点作業（アノテーション）が必要になります（第1回・PDF p.40）。また、代わりに「LLMに採点させる（LLM-as-a-Judge）」方法もありますが、その場合は採点役のLLM自体が正しく採点できているかの確認が必要になるという難しさがあります（第1回・PDF p.40）。
+
+---
+
+**宿題を進める上でのヒント：**
+システムを実際に評価・改善する際には、「1回の正解や1回きりのテスト結果を過信しないこと」や、「どのようなテストケース（答えられない質問など）を用意し、どうやって客観的に採点するか」という視点を意識して考えてみてください。
+
+--- trace ---
+[tool call]   search_materials({'query': 'LLM 評価 難しい'})
+[tool return] search_materials -> {"results": [{"page_id": "lec02-main-p013", "document_id": "lec02-main", "lecture": 2, "document_title": "基盤モデルの仕組み", "s…
+[tool call]   search_materials({'query': 'LLM 評価 難しさ 課題'})
+[tool return] search_materials -> {"results": [{"page_id": "lec01-main-p040", "document_id": "lec01-main", "lecture": 1, "document_title": "AIエンジニアリング概論とA…
+[time] 回答完了まで 9.19 秒（検索・埋め込みを含む）
+[usage] 入力 6,589 tokens / 出力 556 tokens / モデル応答 3 回
+[cost] 生成APIの推定コスト: $0.003367 USD（埋め込み・索引構築分は含まない）
