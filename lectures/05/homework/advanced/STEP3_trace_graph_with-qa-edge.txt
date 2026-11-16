@@ -1,0 +1,38 @@
+[model] gemini-3.5-flash-lite
+                 pydantic-ai v2.57.0 • Python 3.13.11
+
+      / \        agent: target • model: google-cloud:gemini-3.5-flash-lite • tools: 1
+     /   \         capabilities: 0
+   /___.___\
+  /    |    \    observability: off — see every model and tool call live, with cost
+/      |      \    set it up free with Logfire and a GitHub login: https://pydantic.dev/ai-setup.md
+`---.._|_..---'    or use any OpenTelemetry backend: https://pydantic.dev/docs/ai/logfire/#otel
+
+                 goes away once observability is on — or PYDANTIC_AI_NO_BANNER=1
+<repo>/.venv/lib/python3.13/site-packages/google/auth/_default.py:113: UserWarning: Your application has authenticated using end user credentials from Google Cloud SDK without a quota project. You might receive a "quota exceeded" or "API not enabled" error. See the following page for troubleshooting: https://cloud.google.com/docs/authentication/adc-troubleshooting/user-creds. 
+  warnings.warn(_CLOUD_SDK_CREDENTIALS_WARNING)
+LLMを使ったシステムの評価設計が難しいとされる主な理由は、LLM特有の挙動や、システム全体の性質に起因しています。講義資料における具体的な根拠とともに、以下のような点が挙げられます。
+
+1. **同じ質問でも出力が毎回確率的に揺らぐため**
+   - LLMは確率に基づいて次の言葉を選ぶため、1回試して動いたとしてもそれが常に正しいとは限りません。そのため、1回の正解を過信せず、同じ質問を複数回行って平均やばらつきを見る必要があります（第2回・PDF p.13, p.18）。
+
+2. **知らないことも「それらしく」答えてしまう（ハルシネーション）**
+   - 知識がない質問に対しても、確率的にありそうな文章を流暢に生成してしまうため、誤りやハルシネーションを見抜きにくいという難しさがあります（第2回・PDF p.14）。そのため、あえて「分からない」と言えるべき質問を評価セットに含めるなどの工夫が必要です。
+
+3. **平均的な正答率だけでは本番での良し悪しを測れないため**
+   - 開発者が手元で試した程度の正答率（例：100問中95問正解など）では十分とは言えません。本番のデータは開発時と変わるほか、質問の種類による正答率の偏りや、モデル自体の鮮度の低下といった問題があります（第1回・PDF p.41）。
+
+4. **技術的な指標（正答率など）だけではなく、ビジネス価値との乖離があるため**
+   - 単にモデルの正答率が高いことと、実際にシステム導入の目的（例：講師の負担がどれくらい減るかなど）が達成されているかは直結しないため、価値の指標も含めた設計が必要です（第1回・PDF p.42）。
+
+---
+
+### 💡 評価設計を考えるためのヒント
+LLMシステムの評価を設計する際は、単発のテストで「できた・できない」を判断するのではなく、**「どのような質問を何回繰り返し、どのような失敗パターン（知らない質問への応答や確率的な揺れなど）を網羅して測るべきか」**という視点で全体像を組み立ててみましょう。
+
+--- trace ---
+[tool call]   search_graph({'query': 'LLM 評価 難しい'})
+[tool return] search_graph -> {"seeds": [{"page_id": "lec02-main-p013", "document_id": "lec02-main", "lecture": 2, "document_title": "基盤モデルの仕組み", "sec…
+[time] 回答完了まで 5.30 秒（検索・埋め込みを含む）
+[usage] 入力 4,768 tokens / 出力 511 tokens / モデル応答 2 回
+[cost] 生成APIの推定コスト: $0.002708 USD（埋め込み・索引構築分は含まない）
