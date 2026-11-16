@@ -49,6 +49,10 @@ def load_pages(source: Path = RAG_SOURCE) -> list[dict]:
     return pages
 
 
+# 第5回 宿題（発展）: Tree でページを開いたとき、問いかけで終わっていれば次のページ（答え）も返す上限
+TREE_ANSWER_PAGES = 2
+
+
 def browse_tree(node_id: str | None = None) -> dict:
     """直下のページは先頭文、指定したページ自身は全文を返す。"""
     tree = json.loads(RAG_TREE.read_text(encoding="utf-8"))
@@ -68,12 +72,27 @@ def browse_tree(node_id: str | None = None) -> dict:
     while remaining:
         node = remaining.pop()
         if node["id"] == node_id:
-            return {
+            result = {
                 "node": describe(node, full=True),
                 "children": [describe(child) for child in node.get("children", [])],
             }
+            if node["kind"] == "page":
+                result["answer_pages"] = answer_pages(pages, node["id"])
+            return result
         remaining.extend(node.get("children", []))
     raise ValueError("対象の目次ノードが見つかりません。")
+
+
+def answer_pages(pages: dict, page_id: str) -> list[dict]:
+    """問いかけで終わるページなら、同じ資料の次のページを全文で返す（続けて問いかけなら、さらに次へ）。"""
+    by_position = {(p["document_id"], p["page"]): p for p in pages.values()}
+    found, current = [], pages[page_id]
+    while len(found) < TREE_ANSWER_PAGES and is_question_page(current):
+        current = by_position.get((current["document_id"], current["page"] + 1))
+        if current is None:
+            break
+        found.append(current)
+    return found
 
 
 def read_page(page_id: str) -> dict:
