@@ -49,6 +49,10 @@ def load_pages(source: Path = RAG_SOURCE) -> list[dict]:
     return pages
 
 
+# 第5回 宿題（発展）: Tree でページを開いたとき、問いかけで終わっていれば次のページ（答え）も返す上限
+TREE_ANSWER_PAGES = 2
+
+
 def browse_tree(node_id: str | None = None) -> dict:
     """直下のページは先頭文、指定したページ自身は全文を返す。"""
     tree = json.loads(RAG_TREE.read_text(encoding="utf-8"))
@@ -68,12 +72,27 @@ def browse_tree(node_id: str | None = None) -> dict:
     while remaining:
         node = remaining.pop()
         if node["id"] == node_id:
-            return {
+            result = {
                 "node": describe(node, full=True),
                 "children": [describe(child) for child in node.get("children", [])],
             }
+            if node["kind"] == "page":
+                result["answer_pages"] = answer_pages(pages, node["id"])
+            return result
         remaining.extend(node.get("children", []))
     raise ValueError("対象の目次ノードが見つかりません。")
+
+
+def answer_pages(pages: dict, page_id: str) -> list[dict]:
+    """問いかけで終わるページなら、同じ資料の次のページを全文で返す（続けて問いかけなら、さらに次へ）。"""
+    by_position = {(p["document_id"], p["page"]): p for p in pages.values()}
+    found, current = [], pages[page_id]
+    while len(found) < TREE_ANSWER_PAGES and is_question_page(current):
+        current = by_position.get((current["document_id"], current["page"] + 1))
+        if current is None:
+            break
+        found.append(current)
+    return found
 
 
 def read_page(page_id: str) -> dict:
@@ -138,6 +157,17 @@ def search(query: str) -> list[dict]:
         return [dict(row) for row in rows]
 
 
+# 第5回 宿題（発展）: 問いかけで終わるページから、次のページ（答え）を優先してたどる
+QUESTION_ENDINGS = ("？", "?", "…", "...")
+
+
+def is_question_page(page: dict) -> bool:
+    """本文の最後（© の行と図の文字起こしを除く）かタイトルが、問いかけの記号で終わるか。"""
+    body = re.sub(r"\n?©[^\n]*$", "", page["content"].strip()).strip()
+    body = body.split("【図表")[0].strip()
+    return body.endswith(QUESTION_ENDINGS) or page["title"].strip().endswith(QUESTION_ENDINGS)
+
+
 def search_graph(query: str) -> dict:
     """ベクトル検索を入口に、前後ページと共通用語で候補を広げる。"""
     pages = {page["page_id"]: page for page in load_pages(RAG_SOURCE)}
@@ -145,11 +175,24 @@ def search_graph(query: str) -> dict:
     nodes = {node["id"]: node for node in graph["nodes"]
              if node["kind"] == "term" or node["id"] in pages}
     adjacent = defaultdict(set)
+    forward = set()  # next_page の向き（前のページ → 次のページ）
     for edge in graph["edges"]:
         a, b = edge["source"], edge["target"]
         if edge["relation"] in ("next_page", "mentions") and a in nodes and b in nodes:
             adjacent[a].add(b)
             adjacent[b].add(a)
+            if edge["relation"] == "next_page":
+                forward.add((a, b))
+    question = {page_id for page_id, page in pages.items() if is_question_page(page)}
+
+    def route_kind(route: list[str]) -> int:
+        """0: 問い→答えだけの道、1: さかのぼりを含まない道、2: さかのぼりを含む道。"""
+        steps = list(zip(route, route[1:]))
+        if all((a, b) in forward and a in question for a, b in steps):
+            return 0
+        if any((b, a) in forward for a, b in steps):
+            return 2
+        return 1
 
     seeds = [hit for hit in search(query) if hit["page_id"] in pages][:min(GRAPH_START_K, GRAPH_MAX_RESULTS)]
     seed_ids = {seed["page_id"] for seed in seeds}
@@ -175,8 +218,10 @@ def search_graph(query: str) -> dict:
                 if neighbor not in pages or neighbor in seed_ids:
                     continue
                 frequency = max((len(adjacent[n]) for n in route if nodes[n]["kind"] == "term"), default=0)
-                priority = (len(route) - 1, frequency, rank, neighbor)
+                kind = route_kind(route)
+                priority = (kind, len(route) - 1, frequency, rank, neighbor)
                 candidate = {**pages[neighbor], "hops": len(route) - 1,
+                             "route": ("answered_by", "forward", "backward")[kind],
                              "path": [{"id": n, "title": nodes[n]["title"]} for n in route]}
                 if neighbor not in candidates or priority < candidates[neighbor][0]:
                     candidates[neighbor] = (priority, candidate)

@@ -1,0 +1,42 @@
+# 第5回 演習 STEP 1：全文投入（2026-11-16 会社Mac で実行。画面の出力を貼り付けて保存）
+# 実行したコマンド:
+#   AIE_QUESTION='第2回の説明では、LoRAは何を固定し何を学習しますか？ QLoRAは何を加えますか？'
+#   export AIE_PROVIDER=vertex
+#   export AIE_GCP_PROJECT=whale-lm-admin-dev
+#   uv run python -m app.agent --full-context --trace "$AIE_QUESTION"
+# 注: 警告に出ていたホームディレクトリのパスは <repo> に置き換えた
+
+[model] gemini-3.5-flash-lite
+[full-context] 入力227,971文字
+                 pydantic-ai v2.57.0 • Python 3.13.11
+      / \
+     /   \       agent: agent • model: google-cloud:gemini-3.5-flash-lite • tools: 0 • capabilities: 0
+   /___.___\
+  /    |    \    observability: off — see every model and tool call live, with cost
+/      |      \    set it up free with Logfire and a GitHub login: https://pydantic.dev/ai-setup.md
+`---.._|_..---'    or use any OpenTelemetry backend: https://pydantic.dev/docs/ai/logfire/#otel
+
+                 goes away once observability is on — or PYDANTIC_AI_NO_BANNER=1
+<repo>/.venv/lib/python3.13/site-packages/google/auth/_default.py:113: UserWarning: Your application has authenticated using end user credentials from Google Cloud SDK without a quota project. You might receive a "quota exceeded" or "API not enabled" error. See the following page for troubleshooting: https://cloud.google.com/docs/authentication/adc-troubleshooting/user-creds. 
+  warnings.warn(_CLOUD_SDK_CREDENTIALS_WARNING)
+学習支援エージェントです。ご質問ありがとうございます。
+
+LoRAとQLoRAの仕組み（何が固定され、何が学習されるか、およびQLoRAの追加要素）については、以下の資料で確認することができます。
+
+- **資料名**: lec02-main / 基盤モデルの仕組み
+- **PDFページ番号**: PDF p.51、PDF p.52
+
+回答を直接書くことはできませんが、考え方のヒントとして以下の点に注目してみてください。
+
+* **LoRAの仕組み**:
+  - モデル全体のパラメータをすべて更新するのではなく、元の重み（事前学習済みの重み）は固定して学習させません。
+  - その代わりに、どのような小さな行列（差分を表す部分）を追加して学習するかを確認してみましょう。
+* **QLoRAの追加要素**:
+  - LoRAの仕組みに加えて、「元の重み」のデータ型や持ち方にどのような工夫を加えることで、さらなる省メモリ化を実現しているかを確認してみましょう（ヒント：bit数に関する表現が記載されています）。
+
+これらのページを参考に、固定するもの・学習するもの・圧縮する要素を整理してみてください。
+
+--- trace ---
+[time] 回答完了まで 11.56 秒（検索・埋め込みを含む）
+[usage] 入力 117,023 tokens / 出力 244 tokens / モデル応答 1 回
+[cost] 生成APIの推定コスト: $0.035717 USD（埋め込み・索引構築分は含まない）

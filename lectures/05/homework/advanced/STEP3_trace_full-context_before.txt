@@ -1,0 +1,40 @@
+[model] gemini-3.5-flash-lite
+[full-context] 入力227,983文字
+                 pydantic-ai v2.57.0 • Python 3.13.11
+
+      / \        agent: agent • model: google-cloud:gemini-3.5-flash-lite • tools: 0
+     /   \         capabilities: 0
+   /___.___\
+  /    |    \    observability: off — see every model and tool call live, with cost
+/      |      \    set it up free with Logfire and a GitHub login: https://pydantic.dev/ai-setup.md
+`---.._|_..---'    or use any OpenTelemetry backend: https://pydantic.dev/docs/ai/logfire/#otel
+
+                 goes away once observability is on — or PYDANTIC_AI_NO_BANNER=1
+<repo>/.venv/lib/python3.13/site-packages/google/auth/_default.py:113: UserWarning: Your application has authenticated using end user credentials from Google Cloud SDK without a quota project. You might receive a "quota exceeded" or "API not enabled" error. See the following page for troubleshooting: https://cloud.google.com/docs/authentication/adc-troubleshooting/user-creds. 
+  warnings.warn(_CLOUD_SDK_CREDENTIALS_WARNING)
+AIエンジニアリング実践講座の学習支援エージェントです。ご質問ありがとうございます。
+
+LLMを使ったシステムの評価設計が難しいとされる主な理由は以下の通りです。
+
+1. **正解が1つに決まらない**
+   - 出力が自由形式であり、「良い回答」を測る方法を自分で作る必要があるため（資料: lec01-main / PDF p.35）。
+2. **同じ入力でも出力が揺れる**
+   - LLMは確率で次の言葉を選ぶ仕組み（サンプリングなど）のため、同じ質問でも出力が変わり、数例試して「動いた」では足りないため（資料: lec01-main / PDF p.35、lec02-main / PDF p.8, 12, 13）。
+3. **体感と実測がずれる**
+   - AIツールを使った実験などで「速くなった」という本人の体感と、実際の作業時間が長くなっていたという実測にズレが生じることがあり、良くなったかどうか測らなければ分からないため（資料: lec01-main / PDF p.27, 35）。
+4. **評価そのものが最大の課題になる**
+   - 従来のMLと比べて、モデルが大きく自由形式の出力を扱うため評価がはるかに難しくなるため（資料: lec01-main / PDF p.68）。
+
+**【根拠の資料とページ】**
+- `lec01-main / AIエンジニアリング概論とAIコーディング`
+  - PDF p.27（体感と実測のずれ）
+  - PDF p.35（正解が1つに決まらない、出力の揺れ、体感と実測のずれ）
+- `lec01-main / 付録：AIエンジニアリングの定義と従来との違い`
+  - PDF p.68（評価がはるかに難しいこと）
+- `lec02-main / 基盤モデルの仕組み`
+  - PDF p.8, 12, 13（確率で言葉を選ぶことによる揺れや評価の必要性）
+
+--- trace ---
+[time] 回答完了まで 4.88 秒（検索・埋め込みを含む）
+[usage] 入力 117,026 tokens / 出力 464 tokens / モデル応答 1 回
+[cost] 生成APIの推定コスト: $0.036268 USD（埋め込み・索引構築分は含まない）
