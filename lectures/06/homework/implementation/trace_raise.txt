@@ -1,0 +1,54 @@
+# 第6回 宿題（実装）：make_quiz が範囲外の回で例外（raise ValueError）を出す版
+# 2026-11-27 会社Mac で実行（Claude Code が実行）。比較のため一時的に raise に変え、実行後に return 版へ戻した
+# 実行したコマンド（4回とも同じ）:
+#   uv run --env-file=.env python -m app.mcp_agent --trace "第99回のクイズを作って"
+# 変更した箇所（app/tools.py の make_quiz）:
+#   return (f"第{lecture}回の用語は用語集にありません。" f"用語がある回: ...")
+#   → raise ValueError(同じメッセージ)
+# 注: サーバー側（MCP サーバーのプロセス）が、例外のトレースバックを標準エラーに長く出した。
+#     そこには「第99回の用語は用語集にありません。用語がある回: …」のメッセージ本文が出ていたが、
+#     モデルに渡ったのは [tool error] の「Error executing tool make_quiz」だけだった。
+#     ここではトレースバックを省き、回答と trace の行だけを残した（バナーも省いた）
+
+
+########## 1回目
+（サーバー側のログ）ERROR Tool 'make_quiz' raised an unexpected exception ... ValueError（トレースバックは省略）
+[model] gemini-3.5-flash-lite
+[tools] MCP サーバー（app/mcp_servers.json）
+申し訳ありません。第99回という回は設定されていない（または用語集に存在しない）ようです。
+対応している回の範囲で確認問題を作成いたしますので、別の回（例えば第1回〜第N回など）を指定していただけますでしょうか？
+--- trace ---
+[tool call]   glossary_make_quiz({'lecture': 99})
+[tool error]  glossary_make_quiz -> Error executing tool make_quiz
+[usage] 入力 5,434 tokens / 出力 72 tokens / モデル応答 2 回
+
+########## 2回目
+（サーバー側のログ）ERROR Tool 'make_quiz' raised an unexpected exception ... ValueError（トレースバックは省略）
+[model] gemini-3.5-flash-lite
+[tools] MCP サーバー（app/mcp_servers.json）
+指定された「第99回」の講座データ（または用語集）が確認できませんでした。
+この講座では講義回数が決まっており、第99回のような回は存在しないか、用語集に登録されていない可能性があります。
+もし他の回（例えば第1回〜第N回など）の確認問題をご希望でしたら、対象の回を指定していただければご用意いたします！
+--- trace ---
+[tool call]   glossary_make_quiz({'lecture': 99})
+[tool error]  glossary_make_quiz -> Error executing tool make_quiz
+[usage] 入力 5,434 tokens / 出力 103 tokens / モデル応答 2 回
+
+########## 3回目
+（サーバー側のログ）ERROR Tool 'make_quiz' raised an unexpected exception ... ValueError（トレースバックは省略）
+[model] gemini-3.5-flash-lite
+[tools] MCP サーバー（app/mcp_servers.json）
+申し訳ありません。「第99回」という回は講座のカリキュラムに存在しないため、クイズを作成することができません。
+対象となる回（例：第1回、第2回など）を指定していただければ、対応する用語の確認問題を作成いたします。どの回のクイズをご希望でしょうか？
+--- trace ---
+[tool call]   glossary_make_quiz({'lecture': 99})
+[tool error]  glossary_make_quiz -> Error executing tool make_quiz
+[usage] 入力 5,434 tokens / 出力 84 tokens / モデル応答 2 回
+
+########## 4回目
+[model] gemini-3.5-flash-lite
+[tools] MCP サーバー（app/mcp_servers.json）
+申し訳ありません。「第99回」という回は講座に存在しないため、クイズを作成することができません。
+講座の回について確認したい点や、他の回の復習クイズをご希望の場合は、お気軽にお申し付けください。
+--- trace ---
+[usage] 入力 2,693 tokens / 出力 51 tokens / モデル応答 1 回

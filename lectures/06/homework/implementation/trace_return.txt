@@ -1,0 +1,75 @@
+# 第6回 宿題（実装）：make_quiz が範囲外の回でメッセージを return で返す版
+# 2026-11-27 会社Mac で実行。画面の出力を貼り付けて保存（プロンプトの行とバナーは省いた）
+# 実行したコマンド（4回とも同じ）:
+#   uv run --env-file=.env python -m app.mcp_agent --trace "第99回のクイズを作って"
+
+########## 1回目（ツールを呼ばなかった）
+[server] glossary: コマンドで起動（uv run python -m app.mcp_server）
+[server] fetch: コマンドで起動（uvx mcp-server-fetch==2026.11.11 --no-readability-js）
+[server] aws: URL に接続（https://knowledge-mcp.global.api.aws）
+[model] gemini-3.5-flash-lite
+[tools] MCP サーバー（app/mcp_servers.json）
+申し訳ありません。「第99回」という回は存在しないか、講座の範囲外です。現在の講座に含まれている回について確認してください。
+
+--- trace ---
+[usage] 入力 2,693 tokens / 出力 31 tokens / モデル応答 1 回
+
+########## 2回目
+[server] glossary: コマンドで起動（uv run python -m app.mcp_server）
+[server] fetch: コマンドで起動（uvx mcp-server-fetch==2026.11.11 --no-readability-js）
+[server] aws: URL に接続（https://knowledge-mcp.global.api.aws）
+[model] gemini-3.5-flash-lite
+[tools] MCP サーバー（app/mcp_servers.json）
+第99回という回は講座の用語集に存在しないため、確認問題を作成することができません。
+
+現在、用語集に登録されているのは以下の回になります：
+- 第1回
+- 第2回
+- 第3回
+- 第4回
+- 第6回
+
+もしこれらの回（例：「第2回の確認問題を作って」など）の復習用クイズをご希望でしたら、改めてご指定ください！
+
+--- trace ---
+[tool call]   glossary_make_quiz({'lecture': 99})
+[tool return] glossary_make_quiz -> 第99回の用語は用語集にありません。用語がある回: 1, 2, 3, 4, 6…
+[usage] 入力 5,451 tokens / 出力 111 tokens / モデル応答 2 回
+
+########## 3回目
+[server] glossary: コマンドで起動（uv run python -m app.mcp_server）
+[server] fetch: コマンドで起動（uvx mcp-server-fetch==2026.11.11 --no-readability-js）
+[server] aws: URL に接続（https://knowledge-mcp.global.api.aws）
+[model] gemini-3.5-flash-lite
+[tools] MCP サーバー（app/mcp_servers.json）
+AIエンジニアリング講座（AIE2026）の用語集を確認しましたが、第99回は存在しない（または用語集に登録されていない）ようです。
+
+現在、用語や確認問題を用意しているのは以下の回です：
+- 第1回
+- 第2回
+- 第3回
+- 第4回
+- 第6回
+
+もしよろしければ、上記のいずれかの回の確認問題を作成いたしますので、ご希望の回をお知らせください！
+
+--- trace ---
+[tool call]   glossary_make_quiz({'lecture': 99})
+[tool return] glossary_make_quiz -> 第99回の用語は用語集にありません。用語がある回: 1, 2, 3, 4, 6…
+[usage] 入力 5,451 tokens / 出力 117 tokens / モデル応答 2 回
+
+########## 4回目
+[server] glossary: コマンドで起動（uv run python -m app.mcp_server）
+[server] fetch: コマンドで起動（uvx mcp-server-fetch==2026.11.11 --no-readability-js）
+[server] aws: URL に接続（https://knowledge-mcp.global.api.aws）
+[model] gemini-3.5-flash-lite
+[tools] MCP サーバー（app/mcp_servers.json）
+第99回という回は、現在の講座の用語集には存在しないようです。
+（用語集で扱っているのは、第1回、第2回、第3回、第4回、第6回です。）
+
+もし他の回（第1〜4回、第6回）のクイズをご希望でしたら、お気軽にお申し付けください！
+
+--- trace ---
+[tool call]   glossary_make_quiz({'lecture': 99})
+[tool return] glossary_make_quiz -> 第99回の用語は用語集にありません。用語がある回: 1, 2, 3, 4, 6…
+[usage] 入力 5,451 tokens / 出力 96 tokens / モデル応答 2 回
